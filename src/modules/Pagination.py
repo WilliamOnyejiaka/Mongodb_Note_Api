@@ -2,8 +2,6 @@ from math import ceil
 
 class Pagination:
 
-    data = "dd"
-
     def __init__(self, data, page=1, results_per_page=10):
         self.data = data
         self.data_length = len(data)

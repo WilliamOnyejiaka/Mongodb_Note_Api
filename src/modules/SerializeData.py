@@ -14,3 +14,10 @@ class SerializeData:
             else:
                 result[attr] = self.data[attr]
         return result
+
+    # def dump(self,data_list):
+    #     result = []
+    #     for index in range(len(data_list)):
+    #         data = SerializeData(data_list[index], needed_attributes).serialize()
+    #         result.append(data)
+        
