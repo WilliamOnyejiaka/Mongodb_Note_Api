@@ -49,11 +49,11 @@ def login():
             refresh_token = create_refresh_token(identity=user_attr['_id'])
             return jsonify({
                 'error': False,
-                'message': "logged in",
                 'user_data': {
                    'id':user_attr['_id'],
                    'email':user_attr['email'],
                    'name':user_attr['name'],
+                   'created_at': user_attr['created_at'],
                 },
                 'tokens': {
                     'access_token': access_token,

@@ -19,16 +19,15 @@ class User:
         return True if db_response.inserted_id else False
 
     @staticmethod
-    def get_user(email, needed_attributes=['_id', 'name', 'email', 'password']):
+    def get_user(email, needed_attributes=['_id', 'name', 'email', 'password', 'created_at']):
         query = users.find_one({'email': email})
         if query:
-            return SerializeData(query, needed_attributes).serialize()
+            return SerializeData(needed_attributes).serialize(query)
         return {}
 
     @staticmethod
     def delete_user(user_id):
         query = users.find_one_and_delete({'_id':ObjectId(user_id)})
-        # query = True
         if query:
             user_notes = Note.get_notes(user_id)
             for index in range(len(user_notes)):

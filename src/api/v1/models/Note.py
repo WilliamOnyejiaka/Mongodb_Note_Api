@@ -22,22 +22,33 @@ class Note:
     @staticmethod
     def get_note(note_id, user_id, needed_attributes=['_id', 'title', 'body', 'user_id', 'created_at', 'updated_at']):
         query = notes.find_one({'_id': ObjectId(note_id), 'user_id': user_id})
-        if query:
-            return SerializeData(query, needed_attributes).serialize()
-        return {}
+        return SerializeData(needed_attributes).serialize(query) if query else {} 
 
     @staticmethod
     def get_notes(user_id, needed_attributes=['_id', 'title', 'body', 'user_id', 'created_at', 'updated_at']):
         query = list(notes.find({'user_id': user_id}).sort('_id'))
+        return SerializeData(needed_attributes).dump(query) if query else []
+    
+    @staticmethod
+    def update_title(user_id,note_id,updated_title):
+        query = notes.update_one({'_id': ObjectId(note_id), 'user_id': user_id}, {'$set': {'title': updated_title, 'updated_at': datetime.now()}})
+        return True if query.raw_result['nModified'] == 1 else False
 
-        if query:
-            data = []
-            for index in range(len(query)):
-                note = SerializeData(
-                    query[index], needed_attributes).serialize()
-                data.append(note)
-            return data
-        return []
+    @staticmethod
+    def update_title(user_id,note_id,updated_title):
+        query = notes.update_one({'_id': ObjectId(note_id), 'user_id': user_id}, {'$set': {'title': updated_title, 'updated_at': datetime.now()}})
+        return True if query.raw_result['nModified'] == 1 else False
+
+    @staticmethod
+    def update_body(user_id, note_id, updated_body):
+        query = notes.update_one({'_id': ObjectId(note_id), 'user_id': user_id}, {
+                                 '$set': {'body': updated_body, 'updated_at': datetime.now()}})
+        return True if query.raw_result['nModified'] == 1 else False
+
+    @staticmethod
+    def update_note(user_id, note_id,note):
+        query = notes.update_one({'_id': ObjectId(note_id), 'user_id': user_id}, {'$set': {'title': note['updated_title'], 'body': note['updated_body'], 'updated_at': datetime.now()}})
+        return True if query.raw_result['nModified'] == 1 else False
 
     @staticmethod
     def delete_note(note_id):
@@ -50,15 +61,14 @@ class Note:
             'body': {
                 '$regex': search_string,
                 "$options": 'i'
-            }
-        }, {'title': {
-            '$regex': search_string,
-            "$options": 'i'
-        }}]}).sort('_id'))
-        data = []
+            }},
+            {
+            'title': {
+                '$regex': search_string,
+                "$options": 'i'
+            }}
+        ]}).sort('_id'))
 
-        for index in range(len(query)):
-            note = SerializeData(query[index], needed_attributes).serialize()
-            data.append(note)
-        
+        data = SerializeData(needed_attributes).dump(query)
+
         return data

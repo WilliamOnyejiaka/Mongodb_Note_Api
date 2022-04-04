@@ -1,3 +1,4 @@
+from turtle import update
 from flask import Blueprint, request, jsonify
 from src.api.v1.models.Note import Note, notes
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -58,11 +59,32 @@ def note_pagination():
     return jsonify({'error': False, 'data': paginate}), 200
 
 
+@note.patch("/update_title/<id>")
+@jwt_required()
+def update_title(id):
+    user_id = get_jwt_identity()
+    title = request.get_json().get('title','')
+    updated = Note.update_title(user_id,id,title)
+    return jsonify({'error': False, 'message': "note title has been updated"}), 200
+
+@note.patch("/update_body/<id>")
+@jwt_required()
+def update_body(id):
+    user_id = get_jwt_identity()
+    body = request.get_json().get('body', '')
+    updated = Note.update_body(user_id, id, body)
+    return jsonify({'error': False, 'message': "note body has been updated"}), 200
+
+
 @note.put("/update_note/<id>")
 @jwt_required()
 def update_note(id):
-    return "Yo"
-
+    user_id = get_jwt_identity()
+    title = request.get_json().get('title', '')
+    body = request.get_json().get('body', '')
+    updated = Note.update_note(
+        user_id, id, {'updated_title': title, 'updated_body': body})
+    return jsonify({'error': False, 'message': "note has been updated"}), 200
 
 @note.delete("/delete_note/<id>")
 @jwt_required()
@@ -105,5 +127,4 @@ def note_search_pagination():
     
     paginate = Pagination(Note.note_search(user_id,search_string), page, limit).meta_data()
 
-    return jsonify({'error': False, 'data': paginate, 'message': "dsd"}), 200
-
+    return jsonify({'error': False, 'data': paginate}), 200
