@@ -33,6 +33,6 @@ def create_app():
 
     @app.errorhandler(404)
     def handle_404(e):
-        return render_template("")
+        return render_template("404.html")
 
     return app
